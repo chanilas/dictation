@@ -1,0 +1,57 @@
+const words = [];
+const results = [];
+
+function startTest() {
+    const studentName = document.getElementById("studentName").value;
+    if (!studentName) {
+        alert("נא להזין שם תלמידה");
+        return;
+    }
+    results.push({ name: studentName, score: 0, total: words.length });
+    nextWord(studentName, 0);
+}
+
+function nextWord(studentName, index) {
+    if (index >= words.length) {
+        showResults(studentName);
+        return;
+    }
+    
+    const word = words[index];
+    const isEnglish = Math.random() < 0.5;
+    let promptText = isEnglish ? `תרגמי לעברית: ${word.english}` : `תרגמי לאנגלית: ${word.hebrew}`;
+    let correctAnswer = isEnglish ? word.hebrew : word.english;
+    
+    let userAnswer = prompt(`${studentName}, ${promptText}`);
+    
+    if (userAnswer && userAnswer.trim().toLowerCase() === correctAnswer.toLowerCase()) {
+        results.find(r => r.name === studentName).score++;
+    }
+    
+    nextWord(studentName, index + 1);
+}
+
+function showResults(studentName) {
+    const studentResult = results.find(r => r.name === studentName);
+    alert(`${studentName}, הציון שלך: ${studentResult.score}/${studentResult.total}`);
+    sendResults(studentName, studentResult.score, studentResult.total);
+}
+
+function sendResults(studentName, score, total) {
+    const email = "your-email@example.com"; // שנה לכתובת הדוא"ל שלך
+    const subject = "תוצאות הכתבה";
+    const body = `שם תלמידה: ${studentName}%0D%0Aציון: ${score}/${total}`;
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+}
+
+function submitWords() {
+    const input = document.getElementById("wordsInput").value;
+    words.length = 0;
+    input.split("\n").forEach(line => {
+        const [english, hebrew] = line.split(",");
+        if (english && hebrew) {
+            words.push({ english: english.trim(), hebrew: hebrew.trim() });
+        }
+    });
+    alert("רשימת מילים נשמרה!");
+}
